@@ -1,11 +1,14 @@
 package gov.nasa.pds.rel.util.xml;
 
 import java.io.File;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
@@ -56,6 +59,29 @@ public class XmlDomUtils
     {
         if(node == null || node.getAttributes() == null) return null;
         return node.getAttributes();
+    }
+
+    
+    public static Map<String, String> getDocNamespaces(Document doc)
+    {
+        Element root = doc.getDocumentElement();
+        NamedNodeMap attrs = root.getAttributes();
+
+        Map<String, String> map = new TreeMap<>();
+        
+        for(int i = 0; i < attrs.getLength(); i++)
+        {
+            Node attr = attrs.item(i);
+            String name = attr.getNodeName();
+            if(name.startsWith("xmlns:"))
+            {
+                name = name.substring(6);
+                String uri = attr.getNodeValue();
+                map.put(uri, name);
+            }
+        }
+
+        return map;
     }
 
 }

@@ -18,10 +18,7 @@ public class MetadataProcessor
     // Logger is initialized programmatically before an instance of this class is created.
     private Logger LOG;
     
-    private DocumentBuilderFactory dbfIgnoreNS;
-    
-    private BasicMetadataExtractor basicExtractor;
-
+    private PdsLabelParser fieldExtractor;
     private MetadataWriter writer;
     
     
@@ -32,11 +29,7 @@ public class MetadataProcessor
         
         LOG = LogManager.getLogger(getClass());
 
-        // Ignore namespaces
-        dbfIgnoreNS = DocumentBuilderFactory.newInstance();
-        dbfIgnoreNS.setNamespaceAware(false);
-        
-        basicExtractor = new BasicMetadataExtractor();
+        fieldExtractor = new PdsLabelParser();
     }
 
 
@@ -44,9 +37,8 @@ public class MetadataProcessor
     {
         LOG.info("Processing file " + file.toURI().getPath());
         
-        Document doc = XmlDomUtils.readXml(dbfIgnoreNS, file);
-        Metadata md = basicExtractor.extract(doc);
+        //fieldExtractor.extract(file, cb);
         
-        writer.write(md);
+        //writer.write(md);
     }
 }
