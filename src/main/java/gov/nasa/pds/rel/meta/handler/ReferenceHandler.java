@@ -12,15 +12,15 @@ public class ReferenceHandler implements NodeHandler
     {
         if("pds.Internal_Reference.pds.lid_reference".equals(name.fullName))
         {
-            meta.lidRefs.add(node.getTextContent().trim());
+            String value = node.getTextContent().trim();
+            meta.lidRefs.add("<" + value + ">");
         }
         else if("pds.Internal_Reference.pds.lidvid_reference".equals(name.fullName))
         {
             String value = node.getTextContent().trim();
             int idx = value.lastIndexOf("::");
             value = value.substring(0, idx);
-            meta.lidRefs.add(value);
+            meta.lidRefs.add("<" + value + ">");
         }
-        
     }
 }

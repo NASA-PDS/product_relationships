@@ -4,6 +4,7 @@ import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
+import gov.nasa.pds.rel.meta.RDFField;
 
 
 public class InvestigationHandler implements NodeHandler
@@ -12,20 +13,30 @@ public class InvestigationHandler implements NodeHandler
     {
         if("pds.Investigation.pds.name".equals(name.fullName))
         {
-            meta.name = node.getTextContent().trim();
+            String value = node.getTextContent().trim();
+            meta.addField(new RDFField("pds:name", value));
         }
         else if("pds.Investigation.pds.type".equals(name.fullName))
         {
-            meta.type = node.getTextContent().trim();
+            String value = node.getTextContent().trim();
+            
+            RDFField field = new RDFField("rdf:type", "pds:" + value);
+            field.fieldType = RDFField.FieldType.IRI;
+            meta.addField(field);
         }
         else if("pds.Investigation.pds.start_date".equals(name.fullName))
         {
-            meta.startDate = node.getTextContent().trim();
+            String value = node.getTextContent().trim();
+            meta.addField(new RDFField("pds:start_date", value, "xsd:date"));
         }
         else if("pds.Investigation.pds.stop_date".equals(name.fullName))
         {
             String value = node.getTextContent().trim();
-            meta.stopDate = value.isEmpty() ? "3000-01-01" : value;
+            if(value.isEmpty()) 
+            {
+                value = "3000-01-01";
+            }
+            meta.addField(new RDFField("pds:stop_date", value, "xsd:date"));
         }
     }
 }

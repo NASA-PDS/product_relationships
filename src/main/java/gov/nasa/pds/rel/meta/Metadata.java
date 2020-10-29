@@ -5,15 +5,21 @@ import java.util.TreeSet;
 
 public class Metadata
 {
+    public String prodClass;
     public String lid;
     public String vid;
-    public String type;
-    public String name;
-    public String title;
-    public String prodClass;
     
-    public String startDate;
-    public String stopDate;
-        
-    public Set<String> lidRefs = new TreeSet<String>();
+    public Set<RDFField> fields = new TreeSet<>();
+    public Set<String> lidRefs = new TreeSet<>();
+    
+    
+    public Metadata()
+    {
+    }
+
+
+    public void addField(RDFField field)
+    {
+        fields.add(field);
+    }
 }
