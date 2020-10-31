@@ -1,26 +1,36 @@
 package gov.nasa.pds.rel.out;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Set;
+import java.io.Writer;
 
-import gov.nasa.pds.rel.meta.Metadata;
-import gov.nasa.pds.rel.meta.RDFField;
-import gov.nasa.pds.rel.util.FieldMapSet;
 import gov.nasa.pds.rel.util.RDFTurtleUtils;
 
 
-public class RDFTurtleWriter implements MetadataWriter
+public class RDFTurtleWriter implements Closeable
 {
-    private FileWriter writer;
-    private boolean firstField;
+    private Writer writer;
+    private boolean firstField = true;
     
     
     public RDFTurtleWriter(File file) throws Exception
     {
-        writer = new FileWriter(file);
-        
+        this.writer = new FileWriter(file);
+        writeHeader();
+    }
+
+    
+    public RDFTurtleWriter(Writer writer) throws Exception
+    {
+        this.writer = writer;
+        writeHeader();
+    }
+
+    
+    private void writeHeader() throws Exception
+    {
         // Header
         writer.write("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
         writer.write("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n");
@@ -28,45 +38,7 @@ public class RDFTurtleWriter implements MetadataWriter
         writer.write("\n");
     }
 
-
-    @Override
-    public void write(Metadata meta) throws Exception
-    {
-        if(meta.lid == null) throw new Exception("Missing LID");
-        if(meta.vid == null) throw new Exception("Missing VID for " + meta.lid);
-        if(meta.prodClass == null) throw new Exception("Missing product class for " + meta.lid);
-        
-        firstField = true;
-        //String lidvid = meta.lid + "::" + meta.vid;
-        
-        writeId(meta.lid);
-        
-        writeLiteral("pds:product_class", meta.prodClass, null);
-        //writeLiteral("pds:lidvid", lidvid);
-        writeLiteral("pds:vid", meta.vid, "xsd:float");
-
-        for(RDFField field: meta.fields)
-        {
-            if(field.fieldType == RDFField.FieldType.Literal)
-            {
-                writeLiteral(field.name, field.value, field.dataType);
-            }
-            else
-            {
-                writeIRI(field.name, field.value);
-            }
-        }
-
-        // References
-        for(String ref: meta.lidRefs)
-        {
-            writeIRI("pds:lid_ref", ref);
-        }
-        
-        writer.write(".\n");        
-    }
-
-
+    
     @Override
     public void close() throws IOException
     {
@@ -74,11 +46,18 @@ public class RDFTurtleWriter implements MetadataWriter
     }
     
     
-    private void writeId(String id) throws Exception
+    public void startRecord(String id) throws Exception
     {
+        firstField = true;
         writer.write("<" + id + ">\n");
     }
 
+    
+    public void endRecord() throws Exception
+    {
+        writer.write(".\n");        
+    }
+    
 
     private void handleFirstField() throws Exception
     {
@@ -91,29 +70,33 @@ public class RDFTurtleWriter implements MetadataWriter
     }
     
     
-    private void writeIRI(String name, String value) throws Exception
+    public void writeIRI(String name, String value) throws Exception
     {
         if(value == null) return;
         handleFirstField();
         
-        writePredicate(name);
+        writer.write("  ");
+        writer.write(name);
+        writer.write(" ");
         writer.write(value);
     }
     
     
-    private void writePredicate(String name) throws Exception
+    public void writeLiteral(String name, String value) throws Exception
     {
-        writer.write("  " + name + " ");
+        writeLiteral(name, value, null);
     }
     
     
-    private void writeLiteral(String name, String value, String dataType) throws Exception
+    public void writeLiteral(String name, String value, String dataType) throws Exception
     {
         if(value == null) return;
         handleFirstField();
         
         // Predicate
-        writePredicate(name);
+        writer.write("  ");
+        writer.write(name);
+        writer.write(" ");
         
         // Literal
         writer.write("\"");
@@ -124,21 +107,6 @@ public class RDFTurtleWriter implements MetadataWriter
         if(dataType != null)
         {
             writer.write("^^" + dataType);
-        }
-    }
-
-    
-    private void write(FieldMapSet fmap) throws Exception
-    {
-        if(fmap == null || fmap.isEmpty()) return;
-        
-        for(String key: fmap.getNames())
-        {
-            Set<String> values = fmap.getValues(key);
-            for(String value: values)
-            {
-                //writeField(key, value);
-            }
         }
     }
 
