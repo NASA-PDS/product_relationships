@@ -8,13 +8,14 @@ import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 import gov.nasa.pds.rel.meta.handler.IdentificationAreaHandler;
+import gov.nasa.pds.rel.meta.handler.InstrumentHandler;
 import gov.nasa.pds.rel.meta.handler.InvestigationHandler;
 import gov.nasa.pds.rel.meta.handler.NodeHandler;
 import gov.nasa.pds.rel.meta.handler.ReferenceHandler;
 import gov.nasa.pds.rel.out.MetadataWriter;
 
 
-public class PdsLabelParserCB implements PdsLabelParser.Callback
+public class MetadataProcessor implements PdsLabelParser.Callback
 {
     private MetadataWriter writer;
     private Metadata meta;
@@ -22,7 +23,7 @@ public class PdsLabelParserCB implements PdsLabelParser.Callback
     private Map<String, NodeHandler> nodeHandlers;
 
     
-    public PdsLabelParserCB(MetadataWriter writer)
+    public MetadataProcessor(MetadataWriter writer)
     {
         this.writer = writer;
         
@@ -30,6 +31,7 @@ public class PdsLabelParserCB implements PdsLabelParser.Callback
         nodeHandlers.put("Identification_Area", new IdentificationAreaHandler());
         nodeHandlers.put("Internal_Reference", new ReferenceHandler());
         nodeHandlers.put("Investigation", new InvestigationHandler());
+        nodeHandlers.put("Instrument", new InstrumentHandler());
     }
     
     

@@ -68,8 +68,8 @@ public class TestPdsLabelParser
 
         File file = new File("/ws/data/context/pds4/investigation/mission.2001_mars_odyssey_1.0.xml");
         
-        PdsLabelParser parser = new PdsLabelParser();
-        parser.parse(file, new MyCB());
+        PdsLabelParser parser = new PdsLabelParser(new MyCB());
+        parser.parse(file);
     }
 
 }

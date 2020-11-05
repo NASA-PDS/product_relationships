@@ -44,8 +44,9 @@ public class PdsLabelParser
     //private PdsDateConverter dateConverter;
     
     
-    public PdsLabelParser()
+    public PdsLabelParser(Callback cb)
     {
+        this.callback = cb;
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
 
@@ -54,9 +55,8 @@ public class PdsLabelParser
     }
 
     
-    public void parse(File file, Callback cb) throws Exception
+    public void parse(File file) throws Exception
     {
-        this.callback = cb;
         Document doc = XmlDomUtils.readXml(dbf, file);
         
         if(callback.onDocumentStart(doc) == Callback.CONTINUE)

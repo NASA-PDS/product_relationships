@@ -87,7 +87,7 @@ public class RDFTurtleWriter implements Closeable
         writeLiteral(name, value, null);
     }
     
-    
+
     public void writeLiteral(String name, String value, String dataType) throws Exception
     {
         if(value == null) return;

@@ -19,10 +19,8 @@ public class InvestigationHandler implements NodeHandler
         else if("pds.Investigation.pds.type".equals(name.fullName))
         {
             String value = node.getTextContent().trim();
-            
-            RDFField field = new RDFField("rdf:type", "pds:" + value);
-            field.fieldType = RDFField.FieldType.IRI;
-            meta.addField(field);
+            meta.type.add(value);
+            meta.prodSubClass = "Investigation";
         }
         else if("pds.Investigation.pds.start_date".equals(name.fullName))
         {
