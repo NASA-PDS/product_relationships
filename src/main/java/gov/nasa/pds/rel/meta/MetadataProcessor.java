@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 import gov.nasa.pds.rel.meta.handler.IdentificationAreaHandler;
 import gov.nasa.pds.rel.meta.handler.InstrumentHandler;
+import gov.nasa.pds.rel.meta.handler.InstrumentHostHandler;
 import gov.nasa.pds.rel.meta.handler.InvestigationHandler;
 import gov.nasa.pds.rel.meta.handler.NodeHandler;
 import gov.nasa.pds.rel.meta.handler.ReferenceHandler;
@@ -32,6 +33,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         nodeHandlers.put("Internal_Reference", new ReferenceHandler());
         nodeHandlers.put("Investigation", new InvestigationHandler());
         nodeHandlers.put("Instrument", new InstrumentHandler());
+        nodeHandlers.put("Instrument_Host", new InstrumentHostHandler());
     }
     
     
@@ -53,7 +55,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
 
     
     @Override
-    public void onLeafNode(Node node, NameInfo name)
+    public void onLeafNode(Node node, NameInfo name) throws Exception
     {
         NodeHandler handler = nodeHandlers.get(name.className);
         if(handler != null)

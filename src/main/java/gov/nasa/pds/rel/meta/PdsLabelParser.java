@@ -31,7 +31,7 @@ public class PdsLabelParser
         
         public int onDocumentStart(Document doc);
         public void onDocumentEnd(Document doc) throws Exception;
-        public void onLeafNode(Node node, NameInfo name);
+        public void onLeafNode(Node node, NameInfo name) throws Exception;
     }
 
     /////////////////////////////////////////////////////////////////

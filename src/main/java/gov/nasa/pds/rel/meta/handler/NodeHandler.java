@@ -8,5 +8,5 @@ import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 
 public interface NodeHandler
 {
-    public void onLeafNode(Node node, NameInfo name, Metadata meta);
+    public void onLeafNode(Node node, NameInfo name, Metadata meta) throws Exception;
 }
