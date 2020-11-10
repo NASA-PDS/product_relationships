@@ -29,7 +29,7 @@ public class PdsLabelParser
     {
         public final int CONTINUE = 0;
         
-        public int onDocumentStart(Document doc);
+        public int onDocumentStart(Document doc, File file);
         public void onDocumentEnd(Document doc) throws Exception;
         public void onLeafNode(Node node, NameInfo name) throws Exception;
     }
@@ -59,7 +59,7 @@ public class PdsLabelParser
     {
         Document doc = XmlDomUtils.readXml(dbf, file);
         
-        if(callback.onDocumentStart(doc) == Callback.CONTINUE)
+        if(callback.onDocumentStart(doc, file) == Callback.CONTINUE)
         {
             extract(doc);
         }

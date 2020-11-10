@@ -10,25 +10,26 @@ public class TargetProcessor
         if(meta.type.contains("dwarf_planet"))
         {
             // Extract name
-            RDFField field = meta.fields.get("pds:name");
-            if(field != null)
+            String value = meta.getTempField("name");
+            if(value != null)
             {
-                int idx = field.value.indexOf(' ');
-                field.value = field.value.substring(idx + 1);
+                int idx = value.indexOf(' ');
+                String name = value.substring(idx + 1);
+                meta.addField(new RDFField("pds:search_name", name.toLowerCase()));
             }
         }
         else if(meta.type.contains("asteroid"))
         {
-            RDFField field = meta.fields.get("pds:name");
-            if(field != null)
+            String value = meta.getTempField("name");
+            if(value != null)
             {
-                String name = extractAsteroidName(field.value);
-                if(name != null) field.value = name; 
+                String name = extractAsteroidName(value);
+                if(name != null) meta.addField(new RDFField("pds:search_name", name.toLowerCase()));
             }
         }
     }
-        
-    
+
+
     public static String extractAsteroidName(String str)
     {
         if(str == null) return null;

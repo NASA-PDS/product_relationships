@@ -28,13 +28,16 @@ public class MetadataWriter implements Closeable
         
         writer.startRecord(lidvid);
 
-        // LID & VID
+        // LID, VID, Title
         writer.writeIRI("pds:lid", "<" + meta.lid + ">");
         writer.writeLiteral("pds:vid", meta.vid, "xsd:float");
+        writer.writeLiteral("pds:title", meta.title);
 
-        // Class & Type
+        // Class
         writer.writeLiteral("pds:class", meta.prodClass);
         writer.writeLiteral("pds:sub_class", meta.prodSubClass);
+        
+        // Type
         for(String val: meta.type)
         {
             writer.writeLiteral("pds:type", val);
@@ -45,9 +48,13 @@ public class MetadataWriter implements Closeable
         {
             writer.writeIRI("pds:lid_ref", ref);
         }
-
+        for(String ref: meta.lidvidRefs)
+        {
+            writer.writeIRI("pds:lidvid_ref", ref);
+        }
+        
         // Other fields
-        for(RDFField field: meta.fields.values())
+        for(RDFField field: meta.getFields())
         {
             if(field.fieldType == RDFField.FieldType.Literal)
             {

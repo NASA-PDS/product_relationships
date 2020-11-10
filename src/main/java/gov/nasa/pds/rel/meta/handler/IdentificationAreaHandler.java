@@ -5,7 +5,6 @@ import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
-import gov.nasa.pds.rel.meta.RDFField;
 
 
 public class IdentificationAreaHandler implements NodeHandler
@@ -22,8 +21,7 @@ public class IdentificationAreaHandler implements NodeHandler
         }
         else if("pds.Identification_Area.pds.title".equals(name.fullName))
         {
-            String value = StringUtils.normalizeSpace(node.getTextContent());
-            meta.addField(new RDFField("pds:title", value));
+            meta.title = StringUtils.normalizeSpace(node.getTextContent());
         }
     }
 }

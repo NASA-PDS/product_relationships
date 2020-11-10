@@ -22,7 +22,7 @@ public class TestPdsLabelParser
 
         
         @Override
-        public int onDocumentStart(Document doc)
+        public int onDocumentStart(Document doc, File file)
         {
             meta = new Metadata();
             meta.prodClass = doc.getDocumentElement().getLocalName();

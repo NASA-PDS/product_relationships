@@ -21,7 +21,7 @@ public class InvestigationHandler implements NodeHandler
         if("pds.Investigation.pds.name".equals(name.fullName))
         {
             String value = node.getTextContent().trim();
-            meta.addField(new RDFField("pds:name", value));
+            meta.addTempField("name", value);
         }
         else if("pds.Investigation.pds.type".equals(name.fullName))
         {

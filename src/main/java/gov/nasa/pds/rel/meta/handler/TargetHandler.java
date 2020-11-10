@@ -12,16 +12,20 @@ public class TargetHandler implements NodeHandler
 {
     public void onLeafNode(Node node, NameInfo name, Metadata meta)
     {
+        if("Target".equals(name.className))
+        {
+            meta.prodSubClass = "target";
+        }
+
         if("pds.Target.pds.name".equals(name.fullName))
         {
             String value = node.getTextContent().trim();
-            meta.addField(new RDFField("pds:name", value));
+            meta.addTempField("name", value);
         }
         else if("pds.Target.pds.type".equals(name.fullName))
         {
             String value = MetaUtils.normalizeType(node.getTextContent());
             meta.type.add(value);
-            meta.prodSubClass = "target";
         }
         else if("pds.Target.pds.description".equals(name.fullName))
         {

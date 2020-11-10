@@ -15,7 +15,7 @@ public class InstrumentHostHandler implements NodeHandler
         if("pds.Instrument_Host.pds.name".equals(name.fullName))
         {
             String value = node.getTextContent().trim();
-            meta.addField(new RDFField("pds:name", value));
+            meta.addTempField("name", value);
         }
         else if("pds.Instrument_Host.pds.type".equals(name.fullName))
         {

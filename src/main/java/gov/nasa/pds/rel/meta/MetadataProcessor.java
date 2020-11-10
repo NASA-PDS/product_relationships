@@ -1,5 +1,6 @@
 package gov.nasa.pds.rel.meta;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
+import gov.nasa.pds.rel.meta.handler.DefaultHandler;
 import gov.nasa.pds.rel.meta.handler.IdentificationAreaHandler;
 import gov.nasa.pds.rel.meta.handler.InstrumentHandler;
 import gov.nasa.pds.rel.meta.handler.InstrumentHostHandler;
@@ -24,15 +26,20 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     private Metadata meta;
     
     private Map<String, NodeHandler> nodeHandlers;
+    private DefaultHandler defaultHandler;
     
     private TargetProcessor targetProc;
 
+    private File docFile;
+    
     
     public MetadataProcessor(MetadataWriter writer)
     {
         this.writer = writer;
 
         // Handlers
+        defaultHandler = new DefaultHandler();
+        
         nodeHandlers = new HashMap<>();
         nodeHandlers.put("Identification_Area", new IdentificationAreaHandler());
         nodeHandlers.put("Internal_Reference", new ReferenceHandler());
@@ -47,8 +54,9 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     
     
     @Override
-    public int onDocumentStart(Document doc)
+    public int onDocumentStart(Document doc, File file)
     {
+        this.docFile = file;
         meta = new Metadata();
         meta.prodClass = doc.getDocumentElement().getLocalName().toLowerCase();
         
@@ -68,18 +76,42 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     public void onLeafNode(Node node, NameInfo name) throws Exception
     {
         NodeHandler handler = nodeHandlers.get(name.className);
-        if(handler != null)
+        if(handler == null) 
         {
-            handler.onLeafNode(node, name, meta);
+            handler = defaultHandler;
+        }
+
+        handler.onLeafNode(node, name, meta);
+    }
+
+    
+    private void processMetadata() throws Exception
+    {
+        validateMetadata();
+        
+        if("target".equalsIgnoreCase(meta.prodSubClass))
+        {
+            targetProc.process(meta);
         }
     }
 
     
-    private void processMetadata()
+    private void validateMetadata() throws Exception
     {
-        if(meta.prodSubClass.equalsIgnoreCase("target"))
+        if(meta.lid == null) throw new Exception("Missing LID: " + docFile.getAbsolutePath());
+        if(meta.vid == null) throw new Exception("Missing VID: " + docFile.getAbsolutePath());
+        
+        if(meta.type.isEmpty())
         {
-            targetProc.process(meta);
+            System.out.println("[WARN] Missing 'type': " + meta.lid + "::" + meta.vid);
+        }
+        
+        if("product_context".equals(meta.prodClass))
+        {
+            if(meta.prodSubClass == null)
+            {
+                System.out.println("[WARN] Missing 'sub_class': " + meta.lid + "::" + meta.vid);
+            }
         }
     }
 }
