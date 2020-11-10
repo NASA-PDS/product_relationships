@@ -47,7 +47,7 @@ public class MetadataWriter implements Closeable
         }
 
         // Other fields
-        for(RDFField field: meta.fields)
+        for(RDFField field: meta.fields.values())
         {
             if(field.fieldType == RDFField.FieldType.Literal)
             {

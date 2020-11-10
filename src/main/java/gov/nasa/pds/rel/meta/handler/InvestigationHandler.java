@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.w3c.dom.Node;
 
+import gov.nasa.pds.rel.meta.MetaUtils;
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 import gov.nasa.pds.rel.meta.RDFField;
@@ -24,9 +25,9 @@ public class InvestigationHandler implements NodeHandler
         }
         else if("pds.Investigation.pds.type".equals(name.fullName))
         {
-            String value = node.getTextContent().trim();
+            String value = MetaUtils.normalizeType(node.getTextContent());
             meta.type.add(value);
-            meta.prodSubClass = "Investigation";
+            meta.prodSubClass = "investigation";
         }
         else if("pds.Investigation.pds.description".equals(name.fullName))
         {

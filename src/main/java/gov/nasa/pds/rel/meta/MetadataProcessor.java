@@ -13,6 +13,8 @@ import gov.nasa.pds.rel.meta.handler.InstrumentHostHandler;
 import gov.nasa.pds.rel.meta.handler.InvestigationHandler;
 import gov.nasa.pds.rel.meta.handler.NodeHandler;
 import gov.nasa.pds.rel.meta.handler.ReferenceHandler;
+import gov.nasa.pds.rel.meta.handler.TargetHandler;
+import gov.nasa.pds.rel.meta.proc.TargetProcessor;
 import gov.nasa.pds.rel.out.MetadataWriter;
 
 
@@ -22,18 +24,25 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     private Metadata meta;
     
     private Map<String, NodeHandler> nodeHandlers;
+    
+    private TargetProcessor targetProc;
 
     
     public MetadataProcessor(MetadataWriter writer)
     {
         this.writer = writer;
-        
+
+        // Handlers
         nodeHandlers = new HashMap<>();
         nodeHandlers.put("Identification_Area", new IdentificationAreaHandler());
         nodeHandlers.put("Internal_Reference", new ReferenceHandler());
         nodeHandlers.put("Investigation", new InvestigationHandler());
         nodeHandlers.put("Instrument", new InstrumentHandler());
         nodeHandlers.put("Instrument_Host", new InstrumentHostHandler());
+        nodeHandlers.put("Target", new TargetHandler());
+        
+        // Processors
+        targetProc = new TargetProcessor();
     }
     
     
@@ -41,7 +50,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     public int onDocumentStart(Document doc)
     {
         meta = new Metadata();
-        meta.prodClass = doc.getDocumentElement().getLocalName();
+        meta.prodClass = doc.getDocumentElement().getLocalName().toLowerCase();
         
         return CONTINUE;
     }
@@ -50,6 +59,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     @Override
     public void onDocumentEnd(Document doc) throws Exception
     {
+        processMetadata();
         writer.write(meta);
     }
 
@@ -64,4 +74,12 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         }
     }
 
+    
+    private void processMetadata()
+    {
+        if(meta.prodSubClass.equalsIgnoreCase("target"))
+        {
+            targetProc.process(meta);
+        }
+    }
 }

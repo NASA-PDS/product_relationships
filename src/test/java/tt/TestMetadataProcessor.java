@@ -12,8 +12,8 @@ public class TestMetadataProcessor
 {
     public static void main(String[] args) throws Exception
     {
-        //testParser();
-        testCrawler();
+        testParser();
+        //testCrawler();
     }
 
     
@@ -25,9 +25,11 @@ public class TestMetadataProcessor
         //File file = new File("/ws/data/context/pds4/investigation/mission.2001_mars_odyssey_1.0.xml");
 
         //File file = new File("/ws/data/context/pds4/instrument/orex.ocams_1.0.xml");
-        File file = new File("/ws/data/context/pds4/instrument_host/spacecraft.hst_1.1.xml");
+        //File file = new File("/ws/data/context/pds4/instrument_host/spacecraft.hst_1.1.xml");
         
-
+        //File file = new File("/ws/data/context/pds4/target/dwarf_planet.136199_eris_1.1.xml");
+        File file = new File("/ws/data/context/pds4/target/asteroid.25143_itokawa_1.0.xml");
+        
         MetadataWriter writer = new MetadataWriter(new File("/tmp/test.ttl"));
         MetadataProcessor proc = new MetadataProcessor(writer);
         PdsLabelParser parser = new PdsLabelParser(proc);        
