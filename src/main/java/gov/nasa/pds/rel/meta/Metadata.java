@@ -16,6 +16,7 @@ public class Metadata
     public String prodSubClass;
     
     public Set<String> type = new TreeSet<>();
+    public Set<String> keywords = new TreeSet<>();
 
     public Set<String> lidRefs = new TreeSet<>();
     public Set<String> lidvidRefs = new TreeSet<>();

@@ -10,17 +10,54 @@ public class ReferenceHandler implements NodeHandler
 {
     public void onLeafNode(Node node, NameInfo name, Metadata meta)
     {
-        if("pds.Internal_Reference.pds.lid_reference".equals(name.fullName))
+        if("Internal_Reference".equals(name.className))
+        {
+            processInternalRef(node, name, meta);            
+        }
+        else if("Bundle_Member_Entry".equals(name.className))
+        {
+            processBundleMemberEntry(node, name, meta);
+        }
+    }
+    
+    
+    private void processInternalRef(Node node, NameInfo name, Metadata meta)
+    {
+        if("lid_reference".equals(name.attrName))
         {
             String value = node.getTextContent().trim();
             meta.lidRefs.add("<" + value + ">");
         }
-        else if("pds.Internal_Reference.pds.lidvid_reference".equals(name.fullName))
+        else if("lidvid_reference".equals(name.attrName))
         {
             String value = node.getTextContent().trim();
-            int idx = value.lastIndexOf("::");
-            value = value.substring(0, idx);
+            
+            // Convert to LID
+            if("product_context".equals(meta.prodClass))
+            {
+                int idx = value.lastIndexOf("::");
+                value = value.substring(0, idx);
+                meta.lidRefs.add("<" + value + ">");
+            }
+            else
+            {
+                meta.lidvidRefs.add("<" + value + ">");
+            }
+        }
+    }
+    
+    
+    private void processBundleMemberEntry(Node node, NameInfo name, Metadata meta)
+    {
+        if("lid_reference".equals(name.attrName))
+        {
+            String value = node.getTextContent().trim();
             meta.lidRefs.add("<" + value + ">");
+        }
+        else if("lidvid_reference".equals(name.attrName))
+        {
+            String value = node.getTextContent().trim();
+            meta.lidvidRefs.add("<" + value + ">");
         }
     }
 }

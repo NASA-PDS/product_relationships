@@ -42,7 +42,13 @@ public class MetadataWriter implements Closeable
         {
             writer.writeLiteral("pds:type", val);
         }
-                
+
+        // Keywords
+        for(String val: meta.keywords)
+        {
+            writer.writeLiteral("pds:keyword", val);
+        }
+        
         // References
         for(String ref: meta.lidRefs)
         {
