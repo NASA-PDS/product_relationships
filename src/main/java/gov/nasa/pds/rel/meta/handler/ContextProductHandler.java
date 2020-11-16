@@ -6,7 +6,7 @@ import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.MetaUtils;
 import gov.nasa.pds.rel.meta.Metadata;
-import gov.nasa.pds.rel.meta.RDFField;
+import gov.nasa.pds.rel.meta.RDFLiteral;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 import gov.nasa.pds.rel.util.DateUtils;
 
@@ -67,7 +67,7 @@ public class ContextProductHandler implements NodeHandler
         else if("description".equals(name.attrName))
         {
             String value = node.getTextContent();
-            meta.addField(new RDFField("pds:description", value));
+            meta.addField(new RDFLiteral("pds:description", value));
         }        
     }
 
@@ -77,12 +77,12 @@ public class ContextProductHandler implements NodeHandler
         if("start_date".equals(name.attrName))
         {
             String value = DateUtils.normalizeDate(node.getTextContent().trim());
-            meta.addField(new RDFField("pds:start_date", value, "xsd:date"));
+            meta.addField(new RDFLiteral("pds:start_date", value, "xsd:date"));
         }
-        else if("stop_date".equals(name.fullName))
+        else if("stop_date".equals(name.attrName))
         {
             String value = DateUtils.normalizeDate(node.getTextContent().trim(), DEFAULT_STOP_DATE);
-            meta.addField(new RDFField("pds:stop_date", value, "xsd:date"));
+            meta.addField(new RDFLiteral("pds:stop_date", value, "xsd:date"));
         }
     }
 }

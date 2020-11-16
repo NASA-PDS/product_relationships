@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<harvest>
+    <directories>
+        <path>/tmp/data</path>
+    </directories>
+    <productFilter>
+        <include>Product_Collection</include>
+        <include>Product_Context</include>
+    </productFilter>
+</harvest>

@@ -34,7 +34,13 @@ public class Metadata
     {
         fields.put(field.name, field);
     }
-    
+
+
+    public RDFField getField(String name)
+    {
+        return fields.get(name);
+    }
+
     
     public Collection<RDFField> getFields()
     {

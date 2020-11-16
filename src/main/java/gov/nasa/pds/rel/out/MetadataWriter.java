@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.RDFField;
+import gov.nasa.pds.rel.meta.RDFLiteral;
 
 
 public class MetadataWriter implements Closeable
@@ -62,9 +63,10 @@ public class MetadataWriter implements Closeable
         // Other fields
         for(RDFField field: meta.getFields())
         {
-            if(field.fieldType == RDFField.FieldType.Literal)
+            if(field.getFieldType() == RDFField.FieldType.Literal)
             {
-                writer.writeLiteral(field.name, field.value, field.dataType);
+                RDFLiteral literal = (RDFLiteral)field;
+                writer.writeLiteral(literal.name, literal.value, literal.dataType);
             }
             else
             {

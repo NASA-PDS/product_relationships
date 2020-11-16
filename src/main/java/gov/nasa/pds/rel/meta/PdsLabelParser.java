@@ -22,12 +22,12 @@ public class PdsLabelParser
         public String className;
         public String attrNs;
         public String attrName;
-        public String fullName;
     }
         
     public static interface Callback
     {
         public final int CONTINUE = 0;
+        public final int SKIP = 1;
         
         public int onDocumentStart(Document doc, File file);
         public void onDocumentEnd(Document doc) throws Exception;
@@ -61,14 +61,13 @@ public class PdsLabelParser
         
         if(callback.onDocumentStart(doc, file) == Callback.CONTINUE)
         {
-            extract(doc);
+            parse(doc);
+            callback.onDocumentEnd(doc);
         }
-        
-        callback.onDocumentEnd(doc);
     }
     
     
-    private void extract(Document doc) throws Exception
+    private void parse(Document doc) throws Exception
     {
         this.localNsMap = XmlDomUtils.getDocNamespaces(doc);
         
@@ -118,9 +117,6 @@ public class PdsLabelParser
         info.attrNs = getNsPrefix(node);
         info.attrName = node.getLocalName();
 
-        // Full name
-        info.fullName = info.classNs + "." + info.className + "." + info.attrNs + "." + info.attrName;
-        
         return info;
     }
     

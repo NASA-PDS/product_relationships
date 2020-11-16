@@ -1,14 +1,12 @@
 package gov.nasa.pds.rel.meta;
 
 
-public class RDFField implements Comparable<RDFField>
+public abstract class RDFField implements Comparable<RDFField>
 {
     public static enum FieldType { Literal, IRI };
     
     public String name;
     public String value;
-    public String dataType;
-    public FieldType fieldType = FieldType.Literal;
     
     
     public RDFField(String name, String value)
@@ -18,13 +16,9 @@ public class RDFField implements Comparable<RDFField>
     }
 
     
-    public RDFField(String name, String value, String dataType)
-    {
-        this(name, value);
-        this.dataType = dataType;
-    }
-
-
+    public abstract FieldType getFieldType();
+    
+    
     @Override
     public int compareTo(RDFField other)
     {

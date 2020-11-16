@@ -4,7 +4,7 @@ import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.MetaUtils;
 import gov.nasa.pds.rel.meta.Metadata;
-import gov.nasa.pds.rel.meta.RDFField;
+import gov.nasa.pds.rel.meta.RDFLiteral;
 import gov.nasa.pds.rel.meta.proc.KeywordProcessor;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 
@@ -31,12 +31,17 @@ public class ContextAreaHandler implements NodeHandler
         if("purpose".equals(name.attrName))
         {
             String value = MetaUtils.normalizeType(node.getTextContent());
-            meta.addField(new RDFField("pds:purpose", value));
+            meta.addField(new RDFLiteral("pds:purpose", value));
         }
         else if("processing_level".equals(name.attrName))
         {
             String value = MetaUtils.normalizeType(node.getTextContent());
-            meta.addField(new RDFField("pds:processing_level", value));
+            meta.addField(new RDFLiteral("pds:processing_level", value));
+        }
+        else if("description".equals(name.attrName))
+        {
+            String value = node.getTextContent();
+            meta.addField(new RDFLiteral("pds:description", value));
         }
     }
 
