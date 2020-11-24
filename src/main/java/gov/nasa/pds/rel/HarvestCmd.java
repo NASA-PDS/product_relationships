@@ -60,7 +60,6 @@ public class HarvestCmd
     
     private void printSummary(CounterMap counters)
     {
-        log.log(LogUtils.LEVEL_SUMMARY, "Summary:");
         int total = counters.getTotal();
         log.log(LogUtils.LEVEL_SUMMARY, "Processed files: " + total);
 

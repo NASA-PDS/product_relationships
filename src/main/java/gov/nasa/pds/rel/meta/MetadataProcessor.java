@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -28,28 +30,32 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     private Metadata meta;
     
     private Map<String, NodeHandler> nodeHandlers;
-    private Map<String, NodeHandler> classHandlers;
+    private Map<String, NodeHandler> docTypeHandlers;
     
     private TargetProcessor targetProc;
     private File docFile;
     
     private CounterMap prodCounters = new CounterMap();
+
+    private Logger log;
     
     
     public MetadataProcessor(Configuration cfg, MetadataWriter writer)
     {
+        log = LogManager.getLogger(this.getClass());
+        
         this.cfg = cfg;
         this.writer = writer;
 
         // Class handlers
-        classHandlers = new HashMap<>();
-        classHandlers.put("Product_Context", new ContextProductHandler());        
+        docTypeHandlers = new HashMap<>();
+        docTypeHandlers.put("Product_Context", new ContextProductHandler());        
         
         NodeHandler handler = new BundleAndCollectionHandler();
-        classHandlers.put("Product_Bundle", handler);
-        classHandlers.put("Product_Collection", handler);
+        docTypeHandlers.put("Product_Bundle", handler);
+        docTypeHandlers.put("Product_Collection", handler);
         
-        classHandlers.put("Product_SPICE_Kernel", new SpiceKernelHandler());
+        docTypeHandlers.put("Product_SPICE_Kernel", new SpiceKernelHandler());
         
         // Node handlers
         nodeHandlers = new HashMap<>();
@@ -91,6 +97,8 @@ public class MetadataProcessor implements PdsLabelParser.Callback
             if(cfg.prodFilterExclude.contains(rootElement)) return SKIP;
         }
         
+        log.info("Processing file " + file.toURI().getPath());
+        
         this.docFile = file;
         meta = new Metadata();
         meta.rootElement = rootElement;
@@ -123,7 +131,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
             return;
         }
 
-        handler = classHandlers.get(meta.rootElement);
+        handler = docTypeHandlers.get(meta.rootElement);
         if(handler != null) 
         {
             handler.onLeafNode(node, name, meta);
@@ -152,7 +160,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         {
             if(meta.type.isEmpty())
             {
-                System.out.println("[WARN] Missing 'type': " + meta.lid + "::" + meta.vid);
+                log.warn("Missing 'type': " + meta.lid + "::" + meta.vid);
             }
         }
     }
