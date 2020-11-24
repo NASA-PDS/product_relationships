@@ -18,6 +18,7 @@ import gov.nasa.pds.rel.meta.handler.ReferenceHandler;
 import gov.nasa.pds.rel.meta.handler.SpiceKernelHandler;
 import gov.nasa.pds.rel.meta.proc.TargetProcessor;
 import gov.nasa.pds.rel.out.MetadataWriter;
+import gov.nasa.pds.rel.util.CounterMap;
 
 
 public class MetadataProcessor implements PdsLabelParser.Callback
@@ -32,6 +33,8 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     private TargetProcessor targetProc;
     private File docFile;
     
+    private CounterMap prodCounters = new CounterMap();
+    
     
     public MetadataProcessor(Configuration cfg, MetadataWriter writer)
     {
@@ -40,13 +43,13 @@ public class MetadataProcessor implements PdsLabelParser.Callback
 
         // Class handlers
         classHandlers = new HashMap<>();
-        classHandlers.put("product_context", new ContextProductHandler());        
+        classHandlers.put("Product_Context", new ContextProductHandler());        
         
         NodeHandler handler = new BundleAndCollectionHandler();
-        classHandlers.put("product_bundle", handler);
-        classHandlers.put("product_collection", handler);
+        classHandlers.put("Product_Bundle", handler);
+        classHandlers.put("Product_Collection", handler);
         
-        classHandlers.put("product_spice_kernel", new SpiceKernelHandler());
+        classHandlers.put("Product_SPICE_Kernel", new SpiceKernelHandler());
         
         // Node handlers
         nodeHandlers = new HashMap<>();
@@ -67,25 +70,35 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     }
     
     
+    public CounterMap getProductCounters()
+    {
+        return prodCounters;
+    }
+    
+    
     @Override
     public int onDocumentStart(Document doc, File file)
     {
-        String prodClass = doc.getDocumentElement().getLocalName().toLowerCase();
+        String rootElement = doc.getDocumentElement().getLocalName();
         
         // Apply class filters
         if(cfg.prodFilterInclude != null && cfg.prodFilterInclude.size() > 0)
         {
-            if(!cfg.prodFilterInclude.contains(prodClass)) return SKIP;
+            if(!cfg.prodFilterInclude.contains(rootElement)) return SKIP;
         }
         if(cfg.prodFilterExclude != null && cfg.prodFilterExclude.size() > 0)
         {
-            if(cfg.prodFilterExclude.contains(prodClass)) return SKIP;
+            if(cfg.prodFilterExclude.contains(rootElement)) return SKIP;
         }
         
         this.docFile = file;
         meta = new Metadata();
-        meta.prodClass = doc.getDocumentElement().getLocalName().toLowerCase();
-        
+        meta.rootElement = rootElement;
+        if(rootElement.startsWith("Product_"))
+        {
+            meta.prodClass.add(rootElement.substring(8).toLowerCase());
+        }
+
         return CONTINUE;
     }
 
@@ -95,6 +108,8 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     {
         processMetadata();
         writer.write(meta);
+        
+        prodCounters.inc(meta.rootElement);
     }
 
     
@@ -108,7 +123,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
             return;
         }
 
-        handler = classHandlers.get(meta.prodClass);
+        handler = classHandlers.get(meta.rootElement);
         if(handler != null) 
         {
             handler.onLeafNode(node, name, meta);
@@ -121,7 +136,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     {
         validateMetadata();
         
-        if("target".equalsIgnoreCase(meta.prodSubClass))
+        if(meta.prodClass.contains("target"))
         {
             targetProc.process(meta);
         }
@@ -133,16 +148,11 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         if(meta.lid == null) throw new Exception("Missing LID: " + docFile.getAbsolutePath());
         if(meta.vid == null) throw new Exception("Missing VID: " + docFile.getAbsolutePath());
         
-        if("product_context".equals(meta.prodClass))
+        if(meta.prodClass.contains("context"))
         {
             if(meta.type.isEmpty())
             {
                 System.out.println("[WARN] Missing 'type': " + meta.lid + "::" + meta.vid);
-            }
-
-            if(meta.prodSubClass == null)
-            {
-                System.out.println("[WARN] Missing 'sub_class': " + meta.lid + "::" + meta.vid);
             }
         }
     }

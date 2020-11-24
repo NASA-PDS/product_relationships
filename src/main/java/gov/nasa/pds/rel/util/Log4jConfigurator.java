@@ -15,6 +15,9 @@ import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 
 public class Log4jConfigurator
 {
+    private static final String DEFAULT_LOG_DIR = "/tmp/harvest-rdf";
+    
+    
     public static void configure(String verbosity, String filePath) 
     {
         ConfigurationBuilder<BuiltConfiguration> cfg = ConfigurationBuilderFactory.newConfigurationBuilder();
@@ -36,10 +39,6 @@ public class Log4jConfigurator
         LoggerComponentBuilder defLog = cfg.newLogger("gov.nasa.pds.rel", level);
         cfg.add(defLog);
         
-        // Minimal logger
-        LoggerComponentBuilder minLog = cfg.newLogger("harvest-min-info", Level.INFO);
-        cfg.add(minLog);
-        
         // Init Log4j
         Configurator.initialize(cfg.build());
     }
@@ -59,9 +58,9 @@ public class Log4jConfigurator
         // Use default log name if not provided
         if(filePath == null)
         {
-            File dir = new File("/tmp/harvest");
+            File dir = new File(DEFAULT_LOG_DIR);
             dir.mkdirs();
-            filePath = "/tmp/harvest/harvest.log";
+            filePath = new File(dir, "harvest.log").getAbsolutePath();
         }
         
         AppenderComponentBuilder appender = cfg.newAppender(name, "FILE");

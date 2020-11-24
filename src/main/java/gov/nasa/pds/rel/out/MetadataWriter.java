@@ -35,8 +35,10 @@ public class MetadataWriter implements Closeable
         writer.writeLiteral("pds:title", meta.title);
 
         // Class
-        writer.writeLiteral("pds:class", meta.prodClass);
-        writer.writeLiteral("pds:sub_class", meta.prodSubClass);
+        for(String val: meta.prodClass)
+        {
+            writer.writeLiteral("pds:class", val);
+        }
         
         // Type
         for(String val: meta.type)

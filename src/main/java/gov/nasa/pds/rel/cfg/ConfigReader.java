@@ -9,12 +9,7 @@ import gov.nasa.pds.rel.util.xml.XmlDomUtils;
 
 public class ConfigReader
 {
-    public ConfigReader()
-    {
-    }
-    
-    
-    public Configuration read(File file) throws Exception
+    public static Configuration read(File file) throws Exception
     {
         Document doc = XmlDomUtils.readXml(file);
         String rootElement = doc.getDocumentElement().getNodeName();

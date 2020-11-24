@@ -25,23 +25,23 @@ public class ContextProductHandler implements NodeHandler
     {
         if("Investigation".equals(name.className))
         {
-            meta.prodSubClass = "investigation";
+            meta.prodClass.add("investigation");
             processCommonAttributes(node, name, meta);
             processInvestigationAttributes(node, name, meta);
         }
         else if("Instrument".equals(name.className))
         {
-            meta.prodSubClass = "instrument";
+            meta.prodClass.add("instrument");
             processCommonAttributes(node, name, meta);
         }
         else if("Instrument_Host".equals(name.className))
         {
-            meta.prodSubClass = "instrument_host";
+            meta.prodClass.add("instrument_host");
             processCommonAttributes(node, name, meta);
         }
         else if("Target".equals(name.className))
         {
-            meta.prodSubClass = "target";
+            meta.prodClass.add("target");
             processCommonAttributes(node, name, meta);
         }
         else if("Type_List".equals(name.className) && "type".equals(name.attrName))

@@ -9,11 +9,11 @@ import java.util.TreeSet;
 
 public class Metadata
 {
+    public String rootElement;
     public String lid;
     public String vid;
     public String title;
-    public String prodClass;
-    public String prodSubClass;
+    public Set<String> prodClass = new TreeSet<>();
     
     public Set<String> type = new TreeSet<>();
     public Set<String> keywords = new TreeSet<>();

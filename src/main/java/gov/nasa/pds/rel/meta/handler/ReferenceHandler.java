@@ -33,7 +33,7 @@ public class ReferenceHandler implements NodeHandler
             String value = node.getTextContent().trim();
             
             // Convert to LID
-            if("product_context".equals(meta.prodClass))
+            if("Product_Context".equals(meta.rootElement))
             {
                 int idx = value.lastIndexOf("::");
                 value = value.substring(0, idx);
