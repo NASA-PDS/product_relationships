@@ -2,9 +2,7 @@ package gov.nasa.pds.rel.meta;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 
 public class Metadata
@@ -13,14 +11,7 @@ public class Metadata
     public String lid;
     public String vid;
     public String title;
-    public Set<String> prodClass = new TreeSet<>();
     
-    public Set<String> type = new TreeSet<>();
-    public Set<String> keywords = new TreeSet<>();
-
-    public Set<String> lidRefs = new TreeSet<>();
-    public Set<String> lidvidRefs = new TreeSet<>();
-
     protected Map<String, String> tempFields = new TreeMap<>();
     protected Map<String, RDFField> fields = new TreeMap<>();
 
@@ -29,10 +20,38 @@ public class Metadata
     {
     }
 
-    
-    public void addField(RDFField field)
+
+    public void addLiteralField(String name, String value)
     {
-        fields.put(field.name, field);
+        addLiteralField(name, value, null);
+    }
+    
+    
+    public void addLiteralField(String name, String value, String dataType)
+    {
+        addField(RDFField.FieldType.Literal, name, value, dataType);
+    }
+
+    
+    public void addIRIField(String name, String value)
+    {
+        addField(RDFField.FieldType.IRI, name, value, null);
+    }
+
+    
+    private void addField(RDFField.FieldType type, String name, String value, String dataType)
+    {
+        RDFField field = fields.get(name);
+        if(field == null)
+        {
+            field = new RDFField(type, name, value);
+            field.dataType = dataType;
+            fields.put(name, field);
+        }
+        else
+        {
+            field.addValue(value);
+        }
     }
 
 

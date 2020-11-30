@@ -18,18 +18,14 @@ public class TestMetadataProcessor
         //System.out.println(TargetProcessor.extractCometName("1P/Halley"));
         //System.out.println(TargetProcessor.extractCometName("C/1996 B2 (Hyakutake)"));
         
-        //testParser();
-        testCrawler();
+        testParser();
+        //testCrawler();
     }
 
     
     private static void testParser() throws Exception
     {
-        //File file = new File("/ws3/OREX/orex_spice/spice_kernels/spk/bennu_refdrmc_v1.xml");
-        //File file = new File("/ws3/OREX/orex_spice/spice_kernels/collection_spice_kernels_v008.xml");
-        //File file = new File("/ws3/OREX/orex_spice/bundle_orex_spice_v008.xml");
-        //File file = new File("/ws/data/context/pds4/instrument/soho.swan_1.0.xml");
-        File file = new File("/ws/data/context/pds4/target/comet.d1993_f2-a_shoemaker-levy_9-a_1.0.xml");
+        File file = new File("/tmp/d1/UVS_CAL_0016o_0000.XML");
         
         MetadataWriter writer = new MetadataWriter(new File("/tmp/test.ttl"));
         MetadataProcessor proc = new MetadataProcessor(new Configuration(), writer);

@@ -4,11 +4,10 @@ import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.MetaUtils;
 import gov.nasa.pds.rel.meta.Metadata;
-import gov.nasa.pds.rel.meta.RDFLiteral;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 
 
-public class SpiceKernelHandler implements NodeHandler
+public class DH_SpiceKernel implements NodeHandler
 {
 
     @Override
@@ -30,7 +29,7 @@ public class SpiceKernelHandler implements NodeHandler
         if("kernel_type".equals(name.attrName))
         {
             String value = MetaUtils.normalizeType(node.getTextContent());
-            meta.type.add(value);
+            meta.addLiteralField("pds:type", value);
         }
     }
 
@@ -40,7 +39,7 @@ public class SpiceKernelHandler implements NodeHandler
         if("file_name".equals(name.attrName))
         {
             String value = node.getTextContent().trim();
-            meta.addField(new RDFLiteral("pds:file_name", value));
+            meta.addLiteralField("pds:file_name", value);
         }
     }
 

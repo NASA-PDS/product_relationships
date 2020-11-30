@@ -31,6 +31,7 @@ public class PdsLabelParser
         
         public int onDocumentStart(Document doc, File file);
         public void onDocumentEnd(Document doc) throws Exception;
+        public int onNode(Node node) throws Exception;
         public void onLeafNode(Node node, NameInfo name) throws Exception;
     }
 
@@ -41,7 +42,6 @@ public class PdsLabelParser
     
     private Map<String, String> globalNsMap;    
     private Map<String, String> localNsMap;
-    //private PdsDateConverter dateConverter;
     
     
     public PdsLabelParser(Callback cb)
@@ -78,6 +78,8 @@ public class PdsLabelParser
 
     private void processNode(Node node) throws Exception
     {
+        if(callback.onNode(node) == Callback.SKIP) return;
+        
         boolean isLeaf = true;
         
         NodeList nl = node.getChildNodes();

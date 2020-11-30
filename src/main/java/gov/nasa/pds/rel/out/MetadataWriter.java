@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.RDFField;
-import gov.nasa.pds.rel.meta.RDFLiteral;
 
 
 public class MetadataWriter implements Closeable
@@ -22,10 +21,9 @@ public class MetadataWriter implements Closeable
     
     public void write(Metadata meta) throws Exception
     {
-        if(meta.lid == null) throw new Exception("Missing LID");
-        if(meta.vid == null) throw new Exception("Missing VID for " + meta.lid);
+        if(meta.lid == null  || meta.lid.isEmpty()) throw new Exception("Missing LID");
+        if(meta.vid == null || meta.vid.isEmpty()) throw new Exception("Missing VID");
         String lidvid = meta.lid + "::" + meta.vid;
-        if(meta.prodClass == null) throw new Exception("Missing product class for " + lidvid);
         
         writer.startRecord(lidvid);
 
@@ -34,46 +32,10 @@ public class MetadataWriter implements Closeable
         writer.writeLiteral("pds:vid", meta.vid, "xsd:float");
         writer.writeLiteral("pds:title", meta.title);
 
-        // Class
-        for(String val: meta.prodClass)
-        {
-            writer.writeLiteral("pds:class", val);
-        }
-        
-        // Type
-        for(String val: meta.type)
-        {
-            writer.writeLiteral("pds:type", val);
-        }
-
-        // Keywords
-        for(String val: meta.keywords)
-        {
-            writer.writeLiteral("pds:keyword", val);
-        }
-        
-        // References
-        for(String ref: meta.lidRefs)
-        {
-            writer.writeIRI("pds:lid_ref", ref);
-        }
-        for(String ref: meta.lidvidRefs)
-        {
-            writer.writeIRI("pds:lidvid_ref", ref);
-        }
-        
         // Other fields
         for(RDFField field: meta.getFields())
         {
-            if(field.getFieldType() == RDFField.FieldType.Literal)
-            {
-                RDFLiteral literal = (RDFLiteral)field;
-                writer.writeLiteral(literal.name, literal.value, literal.dataType);
-            }
-            else
-            {
-                writer.writeIRI(field.name, field.value);
-            }
+            writeField(field);
         }
         
         writer.endRecord();
@@ -86,4 +48,33 @@ public class MetadataWriter implements Closeable
         writer.close();
     }
 
+    
+    private void writeField(RDFField field) throws Exception
+    {
+        if(field.values != null)
+        {
+            for(String value: field.values)
+            {
+                if(field.type == RDFField.FieldType.Literal)
+                {
+                    writer.writeLiteral(field.name, value, field.dataType);
+                }
+                else
+                {
+                    writer.writeIRI(field.name, value);
+                }
+            }
+        }
+        else
+        {
+            if(field.type == RDFField.FieldType.Literal)
+            {
+                writer.writeLiteral(field.name, field.value, field.dataType);
+            }
+            else
+            {
+                writer.writeIRI(field.name, field.value);
+            }
+        }
+    }
 }

@@ -3,47 +3,56 @@ package gov.nasa.pds.rel.meta.proc;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.RDFField;
-import gov.nasa.pds.rel.meta.RDFIri;
-import gov.nasa.pds.rel.meta.RDFLiteral;
 
 
 public class TargetProcessor
 {
     private static final Pattern COMET_NAME_P = Pattern.compile("[1-9][0-9]?p/([a-z][a-z]*)");
-    
+    private Logger log;
     
     public TargetProcessor()
     {
+        log = LogManager.getLogger(this.getClass());
     }
 
 
     public void process(Metadata meta) throws Exception
     {
-        if(meta.type.contains("asteroid"))
+        RDFField field = meta.getField("pds:type");
+        if(field == null) 
+        {
+            log.warn("Missing type for " + meta.lid + "::" + meta.vid);
+            return;
+        }
+        
+        if(field.containsValue("asteroid"))
         {
             String name = extractAsteroidName(meta.title);
-            if(name != null) meta.addField(new RDFLiteral("pds:search_name", name.toLowerCase()));
+            if(name != null) meta.addLiteralField("pds:name", name.toLowerCase());
         }
-        else if(meta.type.contains("planet"))
+        else if(field.containsValue("planet"))
         {
-            meta.addField(new RDFLiteral("pds:search_name", meta.title.toLowerCase()));
+            meta.addLiteralField("pds:name", meta.title.toLowerCase());
         }
-        else if(meta.type.contains("dwarf_planet"))
+        else if(field.containsValue("dwarf_planet"))
         {
             processDwarfPlanet(meta);
         }
-        else if(meta.type.contains("satellite"))
+        else if(field.containsValue("satellite"))
         {
             processSatellite(meta);
         }
-        else if(meta.type.contains("comet"))
+        else if(field.containsValue("comet"))
         {
             String name = extractCometName(meta.title);
-            if(name != null) meta.addField(new RDFLiteral("pds:search_name", name));
+            if(name != null) meta.addLiteralField("pds:name", name);
         }
-        else if(meta.type.contains("star"))
+        else if(field.containsValue("star"))
         {
             processStar(meta);
         }
@@ -56,11 +65,9 @@ public class TargetProcessor
         if(idx > 0)
         {
             String name = meta.title.substring(0, idx);
-            meta.addField(new RDFLiteral("pds:description", meta.title));
+            meta.addLiteralField("pds:description", meta.title);
             meta.title = name;
         }
-
-        meta.addField(new RDFLiteral("pds:search_name", meta.title.toLowerCase()));
     }
 
 
@@ -69,14 +76,19 @@ public class TargetProcessor
         // Extract name
         int idx = meta.title.indexOf(' ');
         String name = meta.title.substring(idx + 1);
-        meta.addField(new RDFLiteral("pds:search_name", name.toLowerCase()));
+        meta.addLiteralField("pds:name", name.toLowerCase());
     }
     
     
     private void processSatellite(Metadata meta) throws Exception
     {
         // Normalize name
-        meta.addField(new RDFLiteral("pds:search_name", meta.title.replaceAll("[/ ]", "").toLowerCase()));
+        String normTitle = meta.title.replaceAll("[/ ]", "").toLowerCase();
+        if(isValidSatelliteName(normTitle))
+        {
+            meta.addLiteralField("pds:name", normTitle);
+        }
+
         // Extract lid of primary
         RDFField desc = meta.getField("pds:description");
         if(desc != null)
@@ -84,7 +96,7 @@ public class TargetProcessor
             String value = extractLidOfPrimary(desc.value);
             if(value != null)
             {
-                meta.addField(new RDFIri("pds:lid_of_primary", "<" + value + ">"));
+                meta.addIRIField("pds:lid_of_primary", "<" + value + ">");
             }
             else
             {
@@ -119,6 +131,20 @@ public class TargetProcessor
     }
     
 
+    public static boolean isValidSatelliteName(String name)
+    {
+        if(name == null) return false;
+        
+        for(int i = 0; i < name.length(); i++)
+        {
+            char ch = name.charAt(i);
+            if(Character.isDigit(ch) || Character.isWhitespace(ch)) return false;
+        }
+        
+        return true;
+    }
+
+        
     public static boolean isValidCometName(String name)
     {
         if(name == null) return false;

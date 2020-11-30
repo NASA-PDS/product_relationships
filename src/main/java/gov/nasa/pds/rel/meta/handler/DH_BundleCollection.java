@@ -7,7 +7,7 @@ import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 
 
-public class BundleAndCollectionHandler implements NodeHandler
+public class DH_BundleCollection implements NodeHandler
 {
 
     @Override
@@ -29,7 +29,7 @@ public class BundleAndCollectionHandler implements NodeHandler
         if("bundle_type".equals(name.attrName))
         {
             String value = MetaUtils.normalizeType(node.getTextContent());
-            meta.type.add(value);
+            meta.addLiteralField("pds:type", value);
         }
     }
     
@@ -39,8 +39,7 @@ public class BundleAndCollectionHandler implements NodeHandler
         if("collection_type".equals(name.attrName))
         {
             String value = MetaUtils.normalizeType(node.getTextContent());
-            meta.type.add(value);
+            meta.addLiteralField("pds:type", value);
         }
     }
-
 }

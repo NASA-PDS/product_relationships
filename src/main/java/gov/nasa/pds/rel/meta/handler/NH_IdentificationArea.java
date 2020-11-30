@@ -4,12 +4,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.Metadata;
-import gov.nasa.pds.rel.meta.RDFLiteral;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
-import gov.nasa.pds.rel.meta.proc.KeywordProcessor;
 
 
-public class IdentificationAreaHandler implements NodeHandler
+public class NH_IdentificationArea implements NodeHandler
 {
     public void onLeafNode(Node node, NameInfo name, Metadata meta)
     {
@@ -29,12 +27,11 @@ public class IdentificationAreaHandler implements NodeHandler
         if("description".equals(name.attrName))
         {
             String value = node.getTextContent();
-            meta.addField(new RDFLiteral("pds:description", value));
+            meta.addLiteralField("pds:description", value);
         }
         else if("keyword".equals(name.attrName))
         {
-            String value = node.getTextContent();
-            KeywordProcessor.getInstance().addKeywords(value, meta.keywords);
+            //String value = node.getTextContent();
         }
     }
 

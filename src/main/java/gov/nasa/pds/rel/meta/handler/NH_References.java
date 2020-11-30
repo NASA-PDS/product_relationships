@@ -6,8 +6,12 @@ import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 
 
-public class ReferenceHandler implements NodeHandler
+public class NH_References implements NodeHandler
 {
+    private static final String LID_REF = "pds:lid_ref";
+    private static final String LIDVID_REF = "pds:lidvid_ref";
+    
+    
     public void onLeafNode(Node node, NameInfo name, Metadata meta)
     {
         if("Internal_Reference".equals(name.className))
@@ -26,7 +30,7 @@ public class ReferenceHandler implements NodeHandler
         if("lid_reference".equals(name.attrName))
         {
             String value = node.getTextContent().trim();
-            meta.lidRefs.add("<" + value + ">");
+            meta.addIRIField(LID_REF, "<" + value + ">");
         }
         else if("lidvid_reference".equals(name.attrName))
         {
@@ -37,11 +41,11 @@ public class ReferenceHandler implements NodeHandler
             {
                 int idx = value.lastIndexOf("::");
                 value = value.substring(0, idx);
-                meta.lidRefs.add("<" + value + ">");
+                meta.addIRIField(LID_REF, "<" + value + ">");
             }
             else
             {
-                meta.lidvidRefs.add("<" + value + ">");
+                meta.addIRIField(LIDVID_REF, "<" + value + ">");
             }
         }
     }
@@ -52,12 +56,12 @@ public class ReferenceHandler implements NodeHandler
         if("lid_reference".equals(name.attrName))
         {
             String value = node.getTextContent().trim();
-            meta.lidRefs.add("<" + value + ">");
+            meta.addIRIField(LID_REF, "<" + value + ">");
         }
         else if("lidvid_reference".equals(name.attrName))
         {
             String value = node.getTextContent().trim();
-            meta.lidvidRefs.add("<" + value + ">");
+            meta.addIRIField(LIDVID_REF, "<" + value + ">");
         }
     }
 }

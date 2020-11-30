@@ -11,13 +11,13 @@ import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.cfg.Configuration;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
-import gov.nasa.pds.rel.meta.handler.BundleAndCollectionHandler;
-import gov.nasa.pds.rel.meta.handler.ContextAreaHandler;
-import gov.nasa.pds.rel.meta.handler.ContextProductHandler;
-import gov.nasa.pds.rel.meta.handler.IdentificationAreaHandler;
+import gov.nasa.pds.rel.meta.handler.DH_BundleCollection;
+import gov.nasa.pds.rel.meta.handler.NH_PrimaryResultSummary;
+import gov.nasa.pds.rel.meta.handler.DH_ContextProduct;
+import gov.nasa.pds.rel.meta.handler.NH_IdentificationArea;
 import gov.nasa.pds.rel.meta.handler.NodeHandler;
-import gov.nasa.pds.rel.meta.handler.ReferenceHandler;
-import gov.nasa.pds.rel.meta.handler.SpiceKernelHandler;
+import gov.nasa.pds.rel.meta.handler.NH_References;
+import gov.nasa.pds.rel.meta.handler.DH_SpiceKernel;
 import gov.nasa.pds.rel.meta.proc.TargetProcessor;
 import gov.nasa.pds.rel.out.MetadataWriter;
 import gov.nasa.pds.rel.util.CounterMap;
@@ -47,41 +47,19 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         this.cfg = cfg;
         this.writer = writer;
 
-        // Class handlers
-        docTypeHandlers = new HashMap<>();
-        docTypeHandlers.put("Product_Context", new ContextProductHandler());        
-        
-        NodeHandler handler = new BundleAndCollectionHandler();
-        docTypeHandlers.put("Product_Bundle", handler);
-        docTypeHandlers.put("Product_Collection", handler);
-        
-        docTypeHandlers.put("Product_SPICE_Kernel", new SpiceKernelHandler());
-        
-        // Node handlers
-        nodeHandlers = new HashMap<>();
-        handler = new IdentificationAreaHandler();
-        nodeHandlers.put("Identification_Area", handler);
-        nodeHandlers.put("Citation_Information", handler);
-        
-        handler = new ContextAreaHandler();
-        nodeHandlers.put("Primary_Result_Summary", handler);
-        nodeHandlers.put("Science_Facets", handler);
-        
-        handler = new ReferenceHandler();
-        nodeHandlers.put("Internal_Reference", handler);
-        nodeHandlers.put("Bundle_Member_Entry", handler);
+        initNodeHandlers();
+        initDocHandlers();
         
         // Processors
         targetProc = new TargetProcessor();
     }
-    
     
     public CounterMap getProductCounters()
     {
         return prodCounters;
     }
     
-    
+
     @Override
     public int onDocumentStart(Document doc, File file)
     {
@@ -104,7 +82,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         meta.rootElement = rootElement;
         if(rootElement.startsWith("Product_"))
         {
-            meta.prodClass.add(rootElement.substring(8).toLowerCase());
+            meta.addLiteralField("pds:class", rootElement.substring(8).toLowerCase());
         }
 
         return CONTINUE;
@@ -120,6 +98,13 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         prodCounters.inc(meta.rootElement);
     }
 
+
+    @Override
+    public int onNode(Node node) throws Exception
+    {
+        return CONTINUE;
+    }
+    
     
     @Override
     public void onLeafNode(Node node, NameInfo name) throws Exception
@@ -144,7 +129,8 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     {
         validateMetadata();
         
-        if(meta.prodClass.contains("target"))
+        RDFField field = meta.getField("pds:class");
+        if(field != null && field.containsValue("target"))
         {
             targetProc.process(meta);
         }
@@ -156,12 +142,47 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         if(meta.lid == null) throw new Exception("Missing LID: " + docFile.getAbsolutePath());
         if(meta.vid == null) throw new Exception("Missing VID: " + docFile.getAbsolutePath());
         
-        if(meta.prodClass.contains("context"))
+        if(meta.rootElement.equals("Product_Context"))
         {
-            if(meta.type.isEmpty())
+            if(meta.getField("pds:type") == null)
             {
                 log.warn("Missing 'type': " + meta.lid + "::" + meta.vid);
             }
         }
     }
+
+
+    private void initNodeHandlers()
+    {
+        nodeHandlers = new HashMap<>();
+        NodeHandler handler;
+
+        handler = new NH_IdentificationArea();
+        nodeHandlers.put("Identification_Area", handler);
+        nodeHandlers.put("Citation_Information", handler);
+        
+        handler = new NH_References();
+        nodeHandlers.put("Internal_Reference", handler);
+        nodeHandlers.put("Bundle_Member_Entry", handler);
+
+        handler = new NH_PrimaryResultSummary();
+        nodeHandlers.put("Primary_Result_Summary", handler);
+        nodeHandlers.put("Science_Facets", handler);
+    }
+
+    
+    private void initDocHandlers()
+    {
+        docTypeHandlers = new HashMap<>();
+        NodeHandler handler;
+        
+        docTypeHandlers.put("Product_Context", new DH_ContextProduct());        
+        
+        handler = new DH_BundleCollection();
+        docTypeHandlers.put("Product_Bundle", handler);
+        docTypeHandlers.put("Product_Collection", handler);
+        
+        docTypeHandlers.put("Product_SPICE_Kernel", new DH_SpiceKernel());
+    }
+
 }
