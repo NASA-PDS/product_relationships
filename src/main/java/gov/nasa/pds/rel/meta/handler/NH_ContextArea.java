@@ -7,7 +7,7 @@ import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 
 
-public class NH_PrimaryResultSummary implements NodeHandler
+public class NH_ContextArea implements NodeHandler
 {
 
     @Override
@@ -21,6 +21,11 @@ public class NH_PrimaryResultSummary implements NodeHandler
         {
             processScienceFacets(node, name, meta);
         }
+        else if("Time_Coordinates".equals(name.className))
+        {
+            processTime(node, name, meta);
+        }
+        
     }
 
     
@@ -50,4 +55,18 @@ public class NH_PrimaryResultSummary implements NodeHandler
         meta.addLiteralField("pds:science_facets", value);
     }
 
+    
+    private void processTime(Node node, NameInfo name, Metadata meta)
+    {
+        if("start_date_time".equals(name.attrName))
+        {
+            String value = node.getTextContent();
+            meta.addLiteralField("pds:start_date_time", value, "xsd:dateTime");
+        }
+        else if("stop_date_time".equals(name.attrName))
+        {
+            String value = node.getTextContent();
+            meta.addLiteralField("pds:stop_date_time", value, "xsd:dateTime");
+        }
+    }
 }

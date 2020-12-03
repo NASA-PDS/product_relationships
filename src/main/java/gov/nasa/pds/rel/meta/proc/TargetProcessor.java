@@ -12,7 +12,7 @@ import gov.nasa.pds.rel.meta.RDFField;
 
 public class TargetProcessor
 {
-    private static final Pattern COMET_NAME_P = Pattern.compile("[1-9][0-9]?p/([a-z][a-z]*)");
+    private static final Pattern COMET_NAME_P = Pattern.compile("[1-9][0-9]?p/([a-z][a-z\\-]*)");
     private Logger log;
     
     public TargetProcessor()
@@ -30,14 +30,16 @@ public class TargetProcessor
             return;
         }
         
-        if(field.containsValue("asteroid"))
+        if(field.containsValue("asteroid") 
+                || field.containsValue("centaur")
+                || field.containsValue("trans-neptunian_object"))
         {
             String name = extractAsteroidName(meta.title);
-            if(name != null) meta.addLiteralField("pds:name", name.toLowerCase());
+            addName(meta, name);
         }
         else if(field.containsValue("planet"))
         {
-            meta.addLiteralField("pds:name", meta.title.toLowerCase());
+            addName(meta, meta.title);
         }
         else if(field.containsValue("dwarf_planet"))
         {
@@ -50,7 +52,7 @@ public class TargetProcessor
         else if(field.containsValue("comet"))
         {
             String name = extractCometName(meta.title);
-            if(name != null) meta.addLiteralField("pds:name", name);
+            addName(meta, name);
         }
         else if(field.containsValue("star"))
         {
@@ -76,7 +78,7 @@ public class TargetProcessor
         // Extract name
         int idx = meta.title.indexOf(' ');
         String name = meta.title.substring(idx + 1);
-        meta.addLiteralField("pds:name", name.toLowerCase());
+        addName(meta, name);
     }
     
     
@@ -86,7 +88,7 @@ public class TargetProcessor
         String normTitle = meta.title.replaceAll("[/ ]", "").toLowerCase();
         if(isValidSatelliteName(normTitle))
         {
-            meta.addLiteralField("pds:name", normTitle);
+            addName(meta, normTitle);
         }
 
         // Extract lid of primary
@@ -101,6 +103,24 @@ public class TargetProcessor
             else
             {
                 System.out.println("[WARN] Could not extract lid of primary from " + meta.lid + "::" + meta.vid);
+            }
+        }
+    }
+    
+    
+    private void addName(Metadata meta, String name)
+    {
+        if(name == null) return;
+        name = name.toLowerCase();
+        
+        meta.addLiteralField("pds:search_name", name);
+        
+        String[] tokens = name.split("-");
+        if(tokens.length > 1)
+        {
+            for(String token: tokens)
+            {
+                meta.addLiteralField("pds:search_name", token);
             }
         }
     }

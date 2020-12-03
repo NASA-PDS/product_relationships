@@ -12,8 +12,9 @@ import org.w3c.dom.Node;
 import gov.nasa.pds.rel.cfg.Configuration;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 import gov.nasa.pds.rel.meta.handler.DH_BundleCollection;
-import gov.nasa.pds.rel.meta.handler.NH_PrimaryResultSummary;
+import gov.nasa.pds.rel.meta.handler.NH_ContextArea;
 import gov.nasa.pds.rel.meta.handler.DH_ContextProduct;
+import gov.nasa.pds.rel.meta.handler.DH_Document;
 import gov.nasa.pds.rel.meta.handler.NH_IdentificationArea;
 import gov.nasa.pds.rel.meta.handler.NodeHandler;
 import gov.nasa.pds.rel.meta.handler.NH_References;
@@ -33,7 +34,6 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     private Map<String, NodeHandler> docTypeHandlers;
     
     private TargetProcessor targetProc;
-    private File docFile;
     
     private CounterMap prodCounters = new CounterMap();
 
@@ -77,8 +77,8 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         
         log.info("Processing file " + file.toURI().getPath());
         
-        this.docFile = file;
         meta = new Metadata();
+        meta.labelFile = file;
         meta.rootElement = rootElement;
         if(rootElement.startsWith("Product_"))
         {
@@ -139,18 +139,27 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     
     private void validateMetadata() throws Exception
     {
-        if(meta.lid == null) throw new Exception("Missing LID: " + docFile.getAbsolutePath());
-        if(meta.vid == null) throw new Exception("Missing VID: " + docFile.getAbsolutePath());
+        if(meta.lid == null) throw new Exception("Missing LID: " + meta.labelFile.getAbsolutePath());
+        if(meta.vid == null) throw new Exception("Missing VID: " + meta.labelFile.getAbsolutePath());
         
         if(meta.rootElement.equals("Product_Context"))
         {
-            if(meta.getField("pds:type") == null)
-            {
-                log.warn("Missing 'type': " + meta.lid + "::" + meta.vid);
-            }
+            validateProductContext();
         }
     }
 
+    
+    private void validateProductContext()
+    {
+        RDFField fldClass = meta.getField("pds:class");
+        if(fldClass.containsValue("telescope")) return;
+        
+        if(meta.getField("pds:type") == null)
+        {
+            log.warn("Missing 'type': " + meta.labelFile.getAbsolutePath());
+        }
+    }
+    
 
     private void initNodeHandlers()
     {
@@ -165,7 +174,8 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         nodeHandlers.put("Internal_Reference", handler);
         nodeHandlers.put("Bundle_Member_Entry", handler);
 
-        handler = new NH_PrimaryResultSummary();
+        handler = new NH_ContextArea();
+        nodeHandlers.put("Time_Coordinates", handler);
         nodeHandlers.put("Primary_Result_Summary", handler);
         nodeHandlers.put("Science_Facets", handler);
     }
@@ -183,6 +193,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         docTypeHandlers.put("Product_Collection", handler);
         
         docTypeHandlers.put("Product_SPICE_Kernel", new DH_SpiceKernel());
+        docTypeHandlers.put("Product_Document", new DH_Document());
     }
 
 }

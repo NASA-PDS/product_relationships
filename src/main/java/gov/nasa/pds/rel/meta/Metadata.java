@@ -1,5 +1,6 @@
 package gov.nasa.pds.rel.meta;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -7,6 +8,7 @@ import java.util.TreeMap;
 
 public class Metadata
 {
+    public File labelFile;
     public String rootElement;
     public String lid;
     public String vid;

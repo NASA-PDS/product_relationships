@@ -25,7 +25,10 @@ public class TestMetadataProcessor
     
     private static void testParser() throws Exception
     {
-        File file = new File("/tmp/d1/UVS_CAL_0016o_0000.XML");
+        //File file = new File("/tmp/d1/UVS_CAL_0016o_0000.XML");
+        File file = new File("/tmp/d1/ref.xml");
+       
+        //File file = new File("/ws3/Geo/lunar/urn-nasa-pds-kaguya_grs_spectra/data_ephemerides/ephemerides_data_collection_inventory.xml");
         
         MetadataWriter writer = new MetadataWriter(new File("/tmp/test.ttl"));
         MetadataProcessor proc = new MetadataProcessor(new Configuration(), writer);

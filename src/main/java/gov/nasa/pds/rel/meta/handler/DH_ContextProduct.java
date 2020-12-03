@@ -2,12 +2,14 @@ package gov.nasa.pds.rel.meta.handler;
 
 import java.time.LocalDate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.MetaUtils;
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 import gov.nasa.pds.rel.util.DateUtils;
+import gov.nasa.pds.rel.util.xml.XmlDomUtils;
 
 
 public class DH_ContextProduct implements NodeHandler
@@ -48,17 +50,24 @@ public class DH_ContextProduct implements NodeHandler
             String value = MetaUtils.normalizeType(node.getTextContent());
             meta.addLiteralField("pds:type", value);
         }
+        else if("Facility".equals(name.className))
+        {
+            meta.addLiteralField("pds:class", "facility");
+            processCommonAttributes(node, name, meta);
+            processFacilityAttributes(node, name, meta);
+        }        
+        else if("Telescope".equals(name.className))
+        {
+            meta.addLiteralField("pds:class", "telescope");
+            processCommonAttributes(node, name, meta);
+            processTelescopeAttributes(node, name, meta);
+        }        
     }
 
 
     private void processCommonAttributes(Node node, NameInfo name, Metadata meta)
     {
-        if("name".equals(name.attrName))
-        {
-            String value = node.getTextContent().trim();
-            meta.addTempField("name", value);
-        }
-        else if("type".equals(name.attrName))
+        if("type".equals(name.attrName))
         {
             String value = MetaUtils.normalizeType(node.getTextContent());
             meta.addLiteralField("pds:type", value);
@@ -82,6 +91,60 @@ public class DH_ContextProduct implements NodeHandler
         {
             String value = DateUtils.normalizeDate(node.getTextContent().trim(), DEFAULT_STOP_DATE);
             meta.addLiteralField("pds:stop_date", value, "xsd:date");
+        }
+    }
+
+
+    private void processFacilityAttributes(Node node, NameInfo name, Metadata meta) throws Exception
+    {
+        if("address".equals(name.attrName))
+        {
+            String value = StringUtils.normalizeSpace(node.getTextContent());
+            meta.addLiteralField("pds:address", value);
+        }
+        else if("country".equals(name.attrName))
+        {
+            String value = node.getTextContent().trim().toLowerCase();
+            meta.addLiteralField("pds:country", value);
+        }
+    }
+
+    
+    private void processTelescopeAttributes(Node node, NameInfo name, Metadata meta) throws Exception
+    {
+        if("aperture".equals(name.attrName))
+        {
+            addValueAndUnit(meta, node, "pds:aperture");
+        }
+        else if("telescope_longitude".equals(name.attrName))
+        {
+            addValueAndUnit(meta, node, "pds:longitude");
+        }
+        else if("telescope_latitude".equals(name.attrName))
+        {
+            addValueAndUnit(meta, node, "pds:latitude");
+        }
+        else if("telescope_altitude".equals(name.attrName))
+        {
+            addValueAndUnit(meta, node, "pds:altitude");
+        }
+        else if("coordinate_source".equals(name.attrName))
+        {
+            String value = StringUtils.normalizeSpace(node.getTextContent());
+            meta.addLiteralField("pds:coordinate_source", value);
+        }
+    }
+
+    
+    private void addValueAndUnit(Metadata meta, Node node, String fieldName)
+    {
+        String value = node.getTextContent().trim();
+        meta.addLiteralField(fieldName, value, "xsd:float");
+        
+        String unit = XmlDomUtils.getAttribute(node, "unit");
+        if(unit != null)
+        {
+            meta.addLiteralField(fieldName + "_unit", unit);
         }
     }
 }

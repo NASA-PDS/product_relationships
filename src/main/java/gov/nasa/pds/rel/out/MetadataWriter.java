@@ -2,7 +2,13 @@ package gov.nasa.pds.rel.out;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.opencsv.CSVReader;
 
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.RDFField;
@@ -11,11 +17,13 @@ import gov.nasa.pds.rel.meta.RDFField;
 public class MetadataWriter implements Closeable
 {
     private RDFTurtleWriter writer;
-
+    private Logger log;
+    
     
     public MetadataWriter(File file) throws Exception
     {
         this.writer = new RDFTurtleWriter(file);
+        log = LogManager.getLogger(this.getClass());
     }
     
     
@@ -38,6 +46,15 @@ public class MetadataWriter implements Closeable
             writeField(field);
         }
         
+        // File info
+        writeFileInfo(meta);
+        
+        // Collection inventory
+        if(meta.rootElement.equals("Product_Collection"))
+        {
+            writeCollectionInventory(meta);
+        }
+        
         writer.endRecord();
     }
 
@@ -48,6 +65,12 @@ public class MetadataWriter implements Closeable
         writer.close();
     }
 
+    
+    private void writeFileInfo(Metadata meta)
+    {
+        //String filePath = file.toURI().getPath();
+    }
+    
     
     private void writeField(RDFField field) throws Exception
     {
@@ -76,5 +99,34 @@ public class MetadataWriter implements Closeable
                 writer.writeIRI(field.name, field.value);
             }
         }
+    }
+    
+    
+    private void writeCollectionInventory(Metadata meta) throws Exception
+    {
+        RDFField fileNameField = meta.getField("pds:file_name");
+        if(fileNameField == null)
+        {
+            log.warn("Collection label is missing inventory file: " + meta.labelFile.getAbsolutePath());
+        }
+        
+        File labelDir = meta.labelFile.getParentFile();
+        File inventoryFile = new File(labelDir, fileNameField.value);
+        
+        CSVReader rd = new CSVReader(new FileReader(inventoryFile));
+        
+        String[] values = null;
+        while((values = rd.readNext()) != null)
+        {
+            if(values.length < 2) continue;
+            if(values[0].equalsIgnoreCase("P"))
+            {
+                String ref = values[1];
+                String refFieldName = ref.contains("::") ? "pds:lidvid_ref" : "pds:lid_ref";  
+                writer.writeIRI(refFieldName, "<" + ref + ">");
+            }
+        }
+        
+        rd.close();
     }
 }
