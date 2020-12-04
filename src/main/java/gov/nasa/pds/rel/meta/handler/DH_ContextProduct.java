@@ -61,6 +61,11 @@ public class DH_ContextProduct implements NodeHandler
             meta.addLiteralField("pds:class", "telescope");
             processCommonAttributes(node, name, meta);
             processTelescopeAttributes(node, name, meta);
+        }
+        else if("Airborne".equals(name.className))
+        {
+            meta.addLiteralField("pds:class", "airborne");
+            processCommonAttributes(node, name, meta);
         }        
     }
 
