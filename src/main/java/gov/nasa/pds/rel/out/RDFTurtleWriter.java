@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import gov.nasa.pds.rel.util.RDFTurtleUtils;
 
@@ -17,18 +18,11 @@ public class RDFTurtleWriter implements Closeable
     
     public RDFTurtleWriter(File file) throws Exception
     {
-        this.writer = new FileWriter(file);
+        this.writer = new FileWriter(file, StandardCharsets.UTF_8);
         writeHeader();
     }
 
-    
-    public RDFTurtleWriter(Writer writer) throws Exception
-    {
-        this.writer = writer;
-        writeHeader();
-    }
 
-    
     private void writeHeader() throws Exception
     {
         // Header
