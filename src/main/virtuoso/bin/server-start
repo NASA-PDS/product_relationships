@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$(cd "$( dirname $0 )" && pwd)
+VIRTUOSO_HOME=$(cd ${SCRIPT_DIR}/.. && pwd)
+
+cd ${VIRTUOSO_HOME}/database
+${VIRTUOSO_HOME}/bin/virtuoso-t

@@ -27,7 +27,7 @@ harvest-rdf -c /tmp/harvest-rdf.xml
 
 The tool will process all PDS4 labels located in <i>/ws/data/context/pds4/</i> folder and its sub-folders.
 By default, generated RDF Turtle file is located in <i>/tmp/harvest-rdf/data.ttl</i>.
-You can change default output folder by providing "-o" parameter
+You can change default output folder by providing "-o" parameter.
 ```
 harvest-rdf.bat -c /tmp/harvest-rdf.xml -o /tmp/rdf1
 ```
