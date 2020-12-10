@@ -17,10 +17,6 @@ public class DH_Document implements NodeHandler
         {
             processDocument(node, name, meta);            
         }
-        else if("Document_File".equals(name.className))
-        {
-            processFile(node, name, meta);            
-        }
     }
 
     
@@ -35,16 +31,6 @@ public class DH_Document implements NodeHandler
         {
             String value = DateUtils.normalizeDate(node.getTextContent().trim());
             meta.addLiteralField("pds:publication_date", value, "xsd:date");
-        }
-    }
-
-    
-    private void processFile(Node node, NameInfo name, Metadata meta)
-    {
-        if("file_name".equals(name.attrName))
-        {
-            String value = node.getTextContent().trim();
-            meta.addLiteralField("pds:file_name", value);
         }
     }
 

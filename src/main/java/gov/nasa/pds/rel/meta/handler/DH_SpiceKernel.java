@@ -17,10 +17,6 @@ public class DH_SpiceKernel implements NodeHandler
         {
             processSpiceKernel(node, name, meta);            
         }
-        else if("File".equals(name.className))
-        {
-            processFile(node, name, meta);            
-        }
     }
 
     
@@ -30,16 +26,6 @@ public class DH_SpiceKernel implements NodeHandler
         {
             String value = MetaUtils.normalizeType(node.getTextContent());
             meta.addLiteralField("pds:type", value);
-        }
-    }
-
-    
-    private void processFile(Node node, NameInfo name, Metadata meta)
-    {
-        if("file_name".equals(name.attrName))
-        {
-            String value = node.getTextContent().trim();
-            meta.addLiteralField("pds:file_name", value);
         }
     }
 

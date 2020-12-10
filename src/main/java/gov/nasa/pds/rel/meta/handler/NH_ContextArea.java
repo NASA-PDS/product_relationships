@@ -1,15 +1,20 @@
 package gov.nasa.pds.rel.meta.handler;
 
+import java.time.LocalDate;
+
 import org.w3c.dom.Node;
 
 import gov.nasa.pds.rel.meta.MetaUtils;
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
+import gov.nasa.pds.rel.util.DateUtils;
 
 
 public class NH_ContextArea implements NodeHandler
 {
-
+    private static final LocalDate DEFAULT_START_DATE = LocalDate.of(1965, 1, 1);
+    private static final LocalDate DEFAULT_STOP_DATE = LocalDate.of(3000, 1, 1);
+    
     @Override
     public void onLeafNode(Node node, NameInfo name, Metadata meta) throws Exception
     {
@@ -25,7 +30,6 @@ public class NH_ContextArea implements NodeHandler
         {
             processTime(node, name, meta);
         }
-        
     }
 
     
@@ -56,16 +60,16 @@ public class NH_ContextArea implements NodeHandler
     }
 
     
-    private void processTime(Node node, NameInfo name, Metadata meta)
+    private void processTime(Node node, NameInfo name, Metadata meta) throws Exception
     {
         if("start_date_time".equals(name.attrName))
         {
-            String value = node.getTextContent();
+            String value = DateUtils.normalizeDateTime(node.getTextContent().trim(), DEFAULT_START_DATE);
             meta.addLiteralField("pds:start_date_time", value, "xsd:dateTime");
         }
         else if("stop_date_time".equals(name.attrName))
         {
-            String value = node.getTextContent();
+            String value = DateUtils.normalizeDateTime(node.getTextContent().trim(), DEFAULT_STOP_DATE);
             meta.addLiteralField("pds:stop_date_time", value, "xsd:dateTime");
         }
     }

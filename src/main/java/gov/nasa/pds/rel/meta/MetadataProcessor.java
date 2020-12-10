@@ -13,6 +13,7 @@ import gov.nasa.pds.rel.cfg.Configuration;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 import gov.nasa.pds.rel.meta.handler.DH_BundleCollection;
 import gov.nasa.pds.rel.meta.handler.NH_ContextArea;
+import gov.nasa.pds.rel.meta.handler.NH_FileArea;
 import gov.nasa.pds.rel.meta.handler.DH_ContextProduct;
 import gov.nasa.pds.rel.meta.handler.DH_Document;
 import gov.nasa.pds.rel.meta.handler.NH_IdentificationArea;
@@ -178,9 +179,13 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         nodeHandlers.put("Time_Coordinates", handler);
         nodeHandlers.put("Primary_Result_Summary", handler);
         nodeHandlers.put("Science_Facets", handler);
+        
+        handler = new NH_FileArea();
+        nodeHandlers.put("Document_File", handler);
+        nodeHandlers.put("File", handler);
     }
 
-    
+
     private void initDocHandlers()
     {
         docTypeHandlers = new HashMap<>();

@@ -3,6 +3,7 @@ package gov.nasa.pds.rel.meta.handler;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 
+import gov.nasa.pds.rel.meta.MetaUtils;
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 
@@ -31,7 +32,8 @@ public class NH_IdentificationArea implements NodeHandler
         }
         else if("keyword".equals(name.attrName))
         {
-            //String value = node.getTextContent();
+            String value = MetaUtils.normalizeType(node.getTextContent());
+            meta.addLiteralField("pds:keyword", value);
         }
     }
 
