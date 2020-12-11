@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 
+import gov.nasa.pds.rel.meta.Constants;
 import gov.nasa.pds.rel.meta.MetaUtils;
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
@@ -26,23 +27,23 @@ public class DH_ContextProduct implements NodeHandler
     {
         if("Investigation".equals(name.className))
         {
-            meta.addLiteralField("pds:class", "investigation");
+            addContextClass(meta, name.className);
             processCommonAttributes(node, name, meta);
             processInvestigationAttributes(node, name, meta);
         }
         else if("Instrument".equals(name.className))
         {
-            meta.addLiteralField("pds:class", "instrument");
+            addContextClass(meta, name.className);
             processCommonAttributes(node, name, meta);
         }
         else if("Instrument_Host".equals(name.className))
         {
-            meta.addLiteralField("pds:class", "instrument_host");
+            addContextClass(meta, name.className);
             processCommonAttributes(node, name, meta);
         }
         else if("Target".equals(name.className))
         {
-            meta.addLiteralField("pds:class", "target");
+            addContextClass(meta, name.className);
             processCommonAttributes(node, name, meta);
         }
         else if("Type_List".equals(name.className) && "type".equals(name.attrName))
@@ -52,24 +53,30 @@ public class DH_ContextProduct implements NodeHandler
         }
         else if("Facility".equals(name.className))
         {
-            meta.addLiteralField("pds:class", "facility");
+            addContextClass(meta, name.className);
             processCommonAttributes(node, name, meta);
             processFacilityAttributes(node, name, meta);
         }        
         else if("Telescope".equals(name.className))
         {
-            meta.addLiteralField("pds:class", "telescope");
+            addContextClass(meta, name.className);
             processCommonAttributes(node, name, meta);
             processTelescopeAttributes(node, name, meta);
         }
         else if("Airborne".equals(name.className))
         {
-            meta.addLiteralField("pds:class", "airborne");
+            addContextClass(meta, name.className);
             processCommonAttributes(node, name, meta);
         }        
     }
 
 
+    private void addContextClass(Metadata meta, String value)
+    {
+        meta.addLiteralField(Constants.FIELD_CONTEXT_CLASS, value.toLowerCase());
+    }
+    
+    
     private void processCommonAttributes(Node node, NameInfo name, Metadata meta)
     {
         if("type".equals(name.attrName))

@@ -29,7 +29,7 @@ public class PdsLabelParser
         public final int CONTINUE = 0;
         public final int SKIP = 1;
         
-        public int onDocumentStart(Document doc, File file);
+        public int onDocumentStart(Document doc, File file) throws Exception;
         public void onDocumentEnd(Document doc) throws Exception;
         public int onNode(Node node) throws Exception;
         public void onLeafNode(Node node, NameInfo name) throws Exception;

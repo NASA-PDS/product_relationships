@@ -104,14 +104,13 @@ public class MetadataWriter implements Closeable
     
     private void writeCollectionInventory(Metadata meta) throws Exception
     {
-        RDFField fileNameField = meta.getField("pds:file_name");
-        if(fileNameField == null)
+        if(meta.inventoryFileName == null)
         {
-            log.warn("Collection label is missing inventory file: " + meta.labelFile.getAbsolutePath());
+            log.warn("Collection label is missing inventory file: " + meta.getLabelPath());
         }
         
-        File labelDir = meta.labelFile.getParentFile();
-        File inventoryFile = new File(labelDir, fileNameField.value);
+        File labelDir = meta.getLabelDir();
+        File inventoryFile = new File(labelDir, meta.inventoryFileName);
         
         CSVReader rd = new CSVReader(new FileReader(inventoryFile));
         

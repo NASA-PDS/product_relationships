@@ -8,6 +8,7 @@ import gov.nasa.pds.rel.meta.MetaUtils;
 import gov.nasa.pds.rel.meta.Metadata;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 import gov.nasa.pds.rel.util.DateUtils;
+import gov.nasa.pds.rel.util.xml.XmlDomUtils;
 
 
 public class NH_ContextArea implements NodeHandler
@@ -72,5 +73,28 @@ public class NH_ContextArea implements NodeHandler
             String value = DateUtils.normalizeDateTime(node.getTextContent().trim(), DEFAULT_STOP_DATE);
             meta.addLiteralField("pds:stop_date_time", value, "xsd:dateTime");
         }
+        else if("local_mean_solar_time".equals(name.attrName))
+        {
+            String value = node.getTextContent().trim();
+            meta.addLiteralField("pds:local_mean_solar_time", value, "xsd:time");
+        }
+        else if("local_true_solar_time".equals(name.attrName))
+        {
+            String value = node.getTextContent().trim();
+            meta.addLiteralField("pds:local_true_solar_time", value, "xsd:time");
+        }
+        else if("solar_longitude".equals(name.attrName))
+        {
+            String value = node.getTextContent().trim();
+            meta.addLiteralField("pds:solar_longitude", value, "xsd:float");
+            
+            String unit = XmlDomUtils.getAttribute(node, "unit");
+            if(unit != null)
+            {
+                // TODO: Convert to degrees?
+                meta.addLiteralField("pds:solar_longitude_unit", unit);
+            }
+        }
+
     }
 }

@@ -7,7 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import gov.nasa.pds.rel.cfg.ConfigReader;
-import gov.nasa.pds.rel.cfg.Configuration;
+import gov.nasa.pds.rel.cfg.model.Configuration;
 import gov.nasa.pds.rel.meta.MetadataProcessor;
 import gov.nasa.pds.rel.meta.PdsLabelParser;
 import gov.nasa.pds.rel.out.MetadataWriter;

@@ -29,6 +29,7 @@ public class RDFTurtleWriter implements Closeable
         writer.write("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
         writer.write("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n");
         writer.write("PREFIX pds: <pds:>\n");
+        writer.write("PREFIX reg: <reg:>\n");
         writer.write("\n");
     }
 

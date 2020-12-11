@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import gov.nasa.pds.rel.cfg.Configuration;
+import gov.nasa.pds.rel.cfg.model.Configuration;
 import gov.nasa.pds.rel.meta.PdsLabelParser.NameInfo;
 import gov.nasa.pds.rel.meta.handler.DH_BundleCollection;
 import gov.nasa.pds.rel.meta.handler.NH_ContextArea;
@@ -36,14 +36,17 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     
     private TargetProcessor targetProc;
     
+    private FileMetadataExtractor fileMetaExtractor;
     private CounterMap prodCounters = new CounterMap();
 
     private Logger log;
     
     
-    public MetadataProcessor(Configuration cfg, MetadataWriter writer)
+    public MetadataProcessor(Configuration cfg, MetadataWriter writer) throws Exception
     {
         log = LogManager.getLogger(this.getClass());
+        
+        this.fileMetaExtractor = new FileMetadataExtractor(cfg);
         
         this.cfg = cfg;
         this.writer = writer;
@@ -55,6 +58,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         targetProc = new TargetProcessor();
     }
     
+    
     public CounterMap getProductCounters()
     {
         return prodCounters;
@@ -62,7 +66,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     
 
     @Override
-    public int onDocumentStart(Document doc, File file)
+    public int onDocumentStart(Document doc, File file) throws Exception
     {
         String rootElement = doc.getDocumentElement().getLocalName();
         
@@ -78,14 +82,11 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         
         log.info("Processing file " + file.toURI().getPath());
         
-        meta = new Metadata();
-        meta.labelFile = file;
-        meta.rootElement = rootElement;
-        if(rootElement.startsWith("Product_"))
-        {
-            meta.addLiteralField("pds:class", rootElement.substring(8).toLowerCase());
-        }
+        meta = new Metadata(file, rootElement);
+        meta.addLiteralField("pds:product_class", rootElement.toLowerCase());
 
+        fileMetaExtractor.processLabelFile(file, meta);
+        
         return CONTINUE;
     }
 
@@ -130,18 +131,21 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     {
         validateMetadata();
         
-        RDFField field = meta.getField("pds:class");
-        if(field != null && field.containsValue("target"))
+        if(meta.rootElement.equals("Product_Context"))
         {
-            targetProc.process(meta);
+            RDFField field = meta.getField(Constants.FIELD_CONTEXT_CLASS);
+            if(field.containsValue("target"))
+            {
+                targetProc.process(meta);
+            }
         }
     }
 
     
     private void validateMetadata() throws Exception
     {
-        if(meta.lid == null) throw new Exception("Missing LID: " + meta.labelFile.getAbsolutePath());
-        if(meta.vid == null) throw new Exception("Missing VID: " + meta.labelFile.getAbsolutePath());
+        if(meta.lid == null) throw new Exception("Missing LID: " + meta.getLabelPath());
+        if(meta.vid == null) throw new Exception("Missing VID: " + meta.getLabelPath());
         
         if(meta.rootElement.equals("Product_Context"))
         {
@@ -152,12 +156,14 @@ public class MetadataProcessor implements PdsLabelParser.Callback
     
     private void validateProductContext()
     {
-        RDFField fldClass = meta.getField("pds:class");
+        if(!meta.rootElement.equals("Product_Context")) return;
+        
+        RDFField fldClass = meta.getField(Constants.FIELD_CONTEXT_CLASS);
         if(fldClass.containsValue("telescope")) return;
         
         if(meta.getField("pds:type") == null)
         {
-            log.warn("Missing 'type': " + meta.labelFile.getAbsolutePath());
+            log.warn("Missing 'type': " + meta.getLabelPath());
         }
     }
     
@@ -180,7 +186,7 @@ public class MetadataProcessor implements PdsLabelParser.Callback
         nodeHandlers.put("Primary_Result_Summary", handler);
         nodeHandlers.put("Science_Facets", handler);
         
-        handler = new NH_FileArea();
+        handler = new NH_FileArea(fileMetaExtractor);
         nodeHandlers.put("Document_File", handler);
         nodeHandlers.put("File", handler);
     }

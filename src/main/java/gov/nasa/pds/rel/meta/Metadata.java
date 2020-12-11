@@ -8,21 +8,45 @@ import java.util.TreeMap;
 
 public class Metadata
 {
-    public File labelFile;
+    private File labelFile;
+    private File labelDir;
+    
     public String rootElement;
     public String lid;
     public String vid;
     public String title;
+    public String inventoryFileName;
     
-    protected Map<String, String> tempFields = new TreeMap<>();
     protected Map<String, RDFField> fields = new TreeMap<>();
 
     
-    public Metadata()
+    public Metadata(File file, String rootElement)
     {
+        this.labelFile = file;
+        this.labelDir = labelFile.getParentFile();
+        
+        this.rootElement = rootElement;
     }
 
 
+    public File getLabelFile()
+    {
+        return labelFile;
+    }
+
+    
+    public File getLabelDir()
+    {
+        return labelDir;
+    }
+
+    
+    public String getLabelPath()
+    {
+        return labelFile.getAbsolutePath();
+    }
+    
+    
     public void addLiteralField(String name, String value)
     {
         addLiteralField(name, value, null);
@@ -68,16 +92,4 @@ public class Metadata
         return fields.values();
     }
     
-    
-    public void addTempField(String name, String value)
-    {
-        tempFields.put(name, value);
-    }
-
-
-    public String getTempField(String name)
-    {
-        return tempFields.get(name);
-    }
-
 }

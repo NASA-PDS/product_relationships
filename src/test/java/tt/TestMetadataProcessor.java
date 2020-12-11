@@ -3,11 +3,9 @@ package tt;
 import java.io.File;
 
 import gov.nasa.pds.rel.meta.PdsLabelParser;
-import gov.nasa.pds.rel.meta.proc.TargetProcessor;
 import gov.nasa.pds.rel.out.MetadataWriter;
 import gov.nasa.pds.rel.util.FileCrawler;
-import gov.nasa.pds.rel.cfg.ConfigReader;
-import gov.nasa.pds.rel.cfg.Configuration;
+import gov.nasa.pds.rel.cfg.model.Configuration;
 import gov.nasa.pds.rel.meta.MetadataProcessor;
 
 
